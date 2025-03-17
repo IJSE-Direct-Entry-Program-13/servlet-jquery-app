@@ -26,7 +26,7 @@ public class AppContextListener implements ServletContextListener {
         BDS.setMaxIdle(PROPS.getIntProperty("app.datasource.max-idle", 5));
         BDS.setMinIdle(PROPS.getIntProperty("app.datasource.min-idle", 2));
 
-        sce.getServletContext().setAttribute("dataSource", BDS);
+        sce.getServletContext().setAttribute("DATA_SOURCE", BDS);
     }
 
     @Override
