@@ -1,6 +1,6 @@
 package lk.ijse.dep13.backend.data;
 
-import lk.ijse.dep13.backend.to.Customer;
+import lk.ijse.dep13.backend.entity.Customer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // Test Suite
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class CustomerDataAccessTest {
+class CustomerToDataAccessTest {
 
     Connection connection;
 

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'war'
+    id("io.freefair.lombok") version "8.13"
 }
 group 'lk.ijse.dep13'
 version '1.0.0'

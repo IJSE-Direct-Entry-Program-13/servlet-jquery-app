@@ -1,6 +1,6 @@
 package lk.ijse.dep13.backend.data;
 
-import lk.ijse.dep13.backend.to.Customer;
+import lk.ijse.dep13.backend.entity.Customer;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
