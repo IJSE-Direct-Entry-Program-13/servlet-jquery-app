@@ -3,4 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+
+<!--    <servlet>-->
+<!--        <servlet-name>customer-servlet</servlet-name>-->
+<!--        <servlet-class>lk.ijse.dep13.backend.api.CustomerServlet</servlet-class>-->
+<!--        <load-on-startup>0</load-on-startup>-->
+<!--        <multipart-config>-->
+<!--            <location>/tmp</location>-->
+<!--            <max-file-size>5242880</max-file-size>-->
+<!--        </multipart-config>-->
+<!--    </servlet>-->
+<!--    -->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>customer-servlet</servlet-name>-->
+<!--        <url-pattern>/customers/*</url-pattern>-->
+<!--    </servlet-mapping>-->
 </web-app>
