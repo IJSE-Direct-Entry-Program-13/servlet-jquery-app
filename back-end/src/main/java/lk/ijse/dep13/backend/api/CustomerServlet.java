@@ -52,7 +52,7 @@ public class CustomerServlet extends HttpServlet {
                         """.formatted(c.getId(), c.getName(), c.getAddress(), profilePicUrl));
                 json.append(",");
             });
-            json.deleteCharAt(json.length() - 1);
+            if (!customerList.isEmpty()) json.deleteCharAt(json.length() - 1);
             json.append("]");
             resp.getWriter().write(json.toString());
         } catch (SQLException e) {
@@ -121,8 +121,18 @@ public class CustomerServlet extends HttpServlet {
         } else if (!req.getPathInfo().matches("/[Cc]\\d{3}/?")) {
             resp.sendError(400, "Invalid ID Format");
         } else {
-            resp.getWriter().println("<h1>Delete Customer: %s</h1>".formatted(req.
-                    getPathInfo().substring(1)));
+            BasicDataSource cp = (BasicDataSource) getServletContext().getAttribute("DATA_SOURCE");
+            try (Connection connection = cp.getConnection()) {
+                String uploadDirPath = getServletContext().getRealPath("/upload");
+                String customerId = req.getPathInfo().substring(1);
+                if (CustomerBusinessLogic.deleteCustomer(connection, uploadDirPath, customerId)){
+                    resp.setStatus(204);
+                }else{
+                    resp.sendError(404, "Invalid ID");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
