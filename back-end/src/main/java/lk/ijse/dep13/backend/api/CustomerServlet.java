@@ -7,8 +7,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import lk.ijse.dep13.backend.business.CustomerBusinessLogic;
+import lk.ijse.dep13.backend.to.CustomerTo;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
 import java.util.Objects;
 
 @MultipartConfig(location = "/tmp", maxFileSize = 5 * 1024 * 1024)
@@ -47,8 +52,32 @@ public class CustomerServlet extends HttpServlet {
                         !profilePicture.getContentType().contains("image/")) {
                     resp.sendError(400, "Invalid Profile Picture");
                 }else{
-                    resp.getWriter().printf("<h1>Save a Customer name=%s, address=%s</h1>"
-                            , name, address);
+                    BasicDataSource cp = (BasicDataSource) getServletContext().getAttribute("DATA_SOURCE");
+                    try(Connection connection = cp.getConnection()) {
+                        String uploadDirPath = getServletContext().getRealPath("/upload");
+                        CustomerTo<String> newCustomer = CustomerBusinessLogic
+                                .saveCustomer(connection, uploadDirPath,
+                                new CustomerTo<>(null, name, address, profilePicture.getInputStream()));
+
+                        resp.setContentType("application/json");
+                        resp.setStatus(201);
+
+                        String profilePicUrl = req.getScheme() + "://" +
+                                req.getServerName() + ":" + req.getServerPort() + req.getContextPath() + "/upload/" +
+                                newCustomer.getProfilePicture();
+
+                        String json = """
+                                {
+                                "id": "%s",
+                                "name": "%s",
+                                "address": "%s",
+                                "profilePicture": "%s",
+                                }
+                                """.formatted(newCustomer.getId(), name, address, profilePicUrl);
+                        resp.getWriter().println(json);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             } catch (IllegalStateException e) {
                 resp.sendError(400, "Profile picture size exceeds the upload limit of 5MB");

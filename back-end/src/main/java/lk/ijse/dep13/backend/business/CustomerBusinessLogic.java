@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class CustomerBusinessLogic {
 
-    public List<CustomerTo<String>> getAllCustomers(Connection connection) {
+    public static List<CustomerTo<String>> getAllCustomers(Connection connection) {
         return CustomerDataAccess.getAllCustomers(connection)
                 .stream()
                 .map(c -> new CustomerTo<>("C%03d".formatted(c.id()),
@@ -20,7 +20,7 @@ public class CustomerBusinessLogic {
                 .toList();
     }
 
-    public CustomerTo<String> saveCustomer(Connection connection, String uploadDir, CustomerTo<InputStream> customer) {
+    public static CustomerTo<String> saveCustomer(Connection connection, String uploadDir, CustomerTo<InputStream> customer) {
         File profilePictureFile = new File(uploadDir, UUID.randomUUID().toString());
 
         try (FileOutputStream fos = new FileOutputStream(profilePictureFile)) {
@@ -42,7 +42,7 @@ public class CustomerBusinessLogic {
         }
     }
 
-    public boolean deleteCustomer(Connection connection, String uploadDir, String id) {
+    public static boolean deleteCustomer(Connection connection, String uploadDir, String id) {
         int customerId = Integer.parseInt(id.replace("C", ""));
         String profilePic = CustomerDataAccess.getProfilePic(connection, customerId);
         if (CustomerDataAccess.deleteCustomer(connection,customerId)){
