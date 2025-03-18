@@ -12,8 +12,9 @@ import lk.ijse.dep13.backend.to.CustomerTo;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 
 @MultipartConfig(location = "/tmp", maxFileSize = 5 * 1024 * 1024)
@@ -28,7 +29,35 @@ public class CustomerServlet extends HttpServlet {
             resp.sendError(404, "Resource Not Found");
             return;
         }
-        resp.getWriter().println("<h1>Get All Customer List</h1>");
+        BasicDataSource cp = (BasicDataSource) getServletContext().getAttribute("DATA_SOURCE");
+        try (Connection connection = cp.getConnection()) {
+            List<CustomerTo<String>> customerList = CustomerBusinessLogic.getAllCustomers(connection);
+
+            resp.setContentType("application/json");
+            resp.setStatus(200);
+
+            StringBuilder json = new StringBuilder();
+            json.append("[");
+            customerList.forEach(c ->{
+                String profilePicUrl = req.getScheme() + "://" +
+                        req.getServerName() + ":" + req.getServerPort() + req.getContextPath() + "/upload/" +
+                        c.getProfilePicture();
+                json.append("""
+                        {
+                        "id": "%s",
+                        "name": "%s",
+                        "address": "%s",
+                        "profilePicture": "%s"
+                        }
+                        """.formatted(c.getId(), c.getName(), c.getAddress(), profilePicUrl));
+                json.append(",");
+            });
+            json.deleteCharAt(json.length() - 1);
+            json.append("]");
+            resp.getWriter().write(json.toString());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -51,13 +80,13 @@ public class CustomerServlet extends HttpServlet {
                 } else if (profilePicture == null || profilePicture.getContentType() == null ||
                         !profilePicture.getContentType().contains("image/")) {
                     resp.sendError(400, "Invalid Profile Picture");
-                }else{
+                } else {
                     BasicDataSource cp = (BasicDataSource) getServletContext().getAttribute("DATA_SOURCE");
-                    try(Connection connection = cp.getConnection()) {
+                    try (Connection connection = cp.getConnection()) {
                         String uploadDirPath = getServletContext().getRealPath("/upload");
                         CustomerTo<String> newCustomer = CustomerBusinessLogic
                                 .saveCustomer(connection, uploadDirPath,
-                                new CustomerTo<>(null, name, address, profilePicture.getInputStream()));
+                                        new CustomerTo<>(null, name, address, profilePicture.getInputStream()));
 
                         resp.setContentType("application/json");
                         resp.setStatus(201);
