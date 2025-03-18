@@ -5,15 +5,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,12 +66,32 @@ class CustomerDataAccessTest {
 
         // 3. Verify (State)
         assertFalse(customerList.isEmpty());
+        assertEquals(5, customerList.size());
         customerList.forEach(System.out::println);
     }
 
     // Test Case
-    @Test
-    void saveCustomer() {
+    @CsvSource(textBlock = """
+            Buddhi,     Panadura,    buddhi.jpeg
+            Duliya,     Moratuwa,    duliya.jpeg
+            Milinda,    Gamapaha,    milinda.jpeg
+            """, delimiter = ',')
+    @ParameterizedTest
+    void saveCustomer(String name, String address, String profilePic) {
+        int newId = CustomerDataAccess
+                .saveCustomer(connection, new Customer(null, name, address, profilePic));
+
+        assertEquals(6, newId);
+        assertDoesNotThrow(()->{
+            try(Statement stm = connection.createStatement()){
+                ResultSet rst = stm
+                .executeQuery("SELECT name, address, profile_pic FROM customer WHERE id = " + newId);
+                assertTrue(rst.next());
+                assertEquals(name, rst.getString("name"));
+                assertEquals(address, rst.getString("address"));
+                assertEquals(profilePic, rst.getString("profile_pic"));
+            }
+        });
     }
 
     // Test Case
