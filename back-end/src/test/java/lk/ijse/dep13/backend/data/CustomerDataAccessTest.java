@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,18 +34,18 @@ class CustomerDataAccessTest {
         executeScripts();
     }
 
-    private void executeScripts(){
-        try(BufferedReader schemeBr = new BufferedReader(new InputStreamReader
-                (Objects.requireNonNull(getClass().getResourceAsStream("/schema.sql"))))){
+    private void executeScripts() {
+        try (BufferedReader schemeBr = new BufferedReader(new InputStreamReader
+                (Objects.requireNonNull(getClass().getResourceAsStream("/schema.sql"))))) {
             StringBuilder schemaScript = new StringBuilder();
             schemeBr.lines().forEach(schemaScript::append);
-            try(var stm = connection.createStatement()){
+            try (var stm = connection.createStatement()) {
                 stm.execute(schemaScript.toString());
             }
 
             Path path = Path.of(Objects.requireNonNull(getClass().getResource("/data.sql")).toURI());
             String dataScript = Files.readString(path);
-            try(var stm = connection.createStatement()){
+            try (var stm = connection.createStatement()) {
                 stm.execute(dataScript);
             }
         } catch (Exception e) {
@@ -82,10 +82,10 @@ class CustomerDataAccessTest {
                 .saveCustomer(connection, new Customer(null, name, address, profilePic));
 
         assertEquals(6, newId);
-        assertDoesNotThrow(()->{
-            try(Statement stm = connection.createStatement()){
+        assertDoesNotThrow(() -> {
+            try (Statement stm = connection.createStatement()) {
                 ResultSet rst = stm
-                .executeQuery("SELECT name, address, profile_pic FROM customer WHERE id = " + newId);
+                        .executeQuery("SELECT name, address, profile_pic FROM customer WHERE id = " + newId);
                 assertTrue(rst.next());
                 assertEquals(name, rst.getString("name"));
                 assertEquals(address, rst.getString("address"));
@@ -95,7 +95,12 @@ class CustomerDataAccessTest {
     }
 
     // Test Case
-    @Test
-    void deleteCustomer() {
+    @ValueSource(ints = {1, 2, 3})
+    @ParameterizedTest
+    void deleteCustomer(int id) {
+        assertDoesNotThrow(() -> {
+            boolean result = CustomerDataAccess.deleteCustomer(connection, id);
+            assertTrue(result);
+        });
     }
 }
