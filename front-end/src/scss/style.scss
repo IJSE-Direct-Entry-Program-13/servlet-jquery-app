@@ -11,7 +11,7 @@ body {
   td:first-child {
     width: 150px;
   }
-  
+
   @media all and (width <= 475px) {
     td:first-child {
       width: auto;
@@ -21,6 +21,16 @@ body {
   .profile-picture {
     width: clamp(100px, 30vw, 150px);
   }
+
+  td:last-child {
+    i {
+      cursor: pointer;
+
+      &:hover {
+        color: red;
+      }
+    }
+  }
 }
 
 header {
@@ -29,6 +39,7 @@ header {
       i {
         display: none;
       }
+
       font-size: 1.3rem;
     }
 
