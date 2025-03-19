@@ -121,7 +121,9 @@ $('#btn-save').on('click', () => {
         txtName.addClass('is-invalid')
             .trigger('focus').trigger('select');
     }
-
+    if (!flPicture.val()){
+        $("#profile-picture").addClass('is-invalid');
+    }
 });
 
 $("#txt-name, #txt-address").on('input', function () {
@@ -136,6 +138,8 @@ $("#btn-browse").on('click', () => {
 
 $("#btn-clear").on('click', () => {
     flPicture.val('');
+    $("#profile-picture").css('background-image','');
+    $("#profile-picture .bi-image").removeClass('d-none');
 });
 
 flPicture.on('change', () => {
@@ -146,6 +150,7 @@ flPicture.on('change', () => {
         fileReader.addEventListener('load', ()=>{
             $("#profile-picture").css('background-image',
                 `url('${fileReader.result}')`);
+            $("#profile-picture .bi-image").addClass('d-none');
         });
         fileReader.readAsDataURL(file);
     }
