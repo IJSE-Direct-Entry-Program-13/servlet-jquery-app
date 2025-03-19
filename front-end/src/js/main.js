@@ -59,11 +59,25 @@ function loadAllCustomers() {
 }
 
 $('#tbl-customers tbody').on('click', ".bi.bi-trash", (e)=>{
-    const id = $(e.target).parents("tr").find('span.c-id').text();
+    const row = $(e.target).parents("tr");
+    const id = row.find('span.c-id').text();
+    const progressBar = $("#progress-bar");
 
+    progressBar.removeClass('d-none').css('width', '10px');
     const xhr = new XMLHttpRequest();
     xhr.addEventListener('loadend', ()=>{
-
+        if (xhr.status === 204){
+            progressBar.css('width', '100%');
+            setTimeout(()=>{
+                progressBar.addClass('d-none').css('width', '0');
+                row.addClass("animate__animated animate__fadeOut");
+                setTimeout(()=>{
+                    row.remove();
+                }, 500)
+            }, 200);
+        }else{
+            alert("Failed to delete, try again");
+        }
     });
     xhr.open('DELETE',
         `http://localhost:8080/app/v1/customers/${id}`,
