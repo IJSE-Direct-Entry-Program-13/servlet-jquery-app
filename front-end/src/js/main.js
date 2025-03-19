@@ -93,3 +93,5 @@ $('#tbl-customers tbody').on('click', ".bi.bi-trash", (e)=>{
 
     xhr.send();
 });
+
+$("header button").trigger('click');
