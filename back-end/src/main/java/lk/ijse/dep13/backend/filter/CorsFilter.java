@@ -44,6 +44,11 @@ public class CorsFilter extends HttpFilter {
         }else{
             if (origin != null) res.addHeader("Access-Control-Allow-Origin", origin);
             chain.doFilter(req, res);
+
+            /* Let's handle preflight requests */
+            if (req.getMethod().equalsIgnoreCase("OPTIONS")) {
+                res.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE");
+            }
         }
     }
 }
