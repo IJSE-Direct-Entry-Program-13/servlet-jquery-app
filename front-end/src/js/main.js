@@ -16,7 +16,7 @@ function loadAllCustomers() {
                 const customerList = JSON.parse(xhr.responseText);
                 if (customerList.length) {
                     $("#tbl-customers tfoot").addClass('d-none');
-                    customerList.forEach(c =>{
+                    customerList.forEach(c => {
                         $('#tbl-customers tbody').append(`
                     <tr class="animate__animated animate__fadeIn">
                         <td>
@@ -59,7 +59,7 @@ function loadAllCustomers() {
 
 }
 
-$('#tbl-customers tbody').on('click', ".bi.bi-trash", (e)=>{
+$('#tbl-customers tbody').on('click', ".bi.bi-trash", (e) => {
     const row = $(e.target).parents("tr");
     const id = row.find('span.c-id').text();
     const progressBar = $("#progress-bar");
@@ -68,21 +68,21 @@ $('#tbl-customers tbody').on('click', ".bi.bi-trash", (e)=>{
 
     const xhr = new XMLHttpRequest();
 
-    xhr.addEventListener('loadend', ()=>{
-        if (xhr.status === 204){
+    xhr.addEventListener('loadend', () => {
+        if (xhr.status === 204) {
             progressBar.css('width', '100%');
-            setTimeout(()=>{
+            setTimeout(() => {
                 progressBar.addClass('d-none').css('width', '0');
                 row.addClass("animate__animated animate__fadeOut");
 
-                setTimeout(()=>{
+                setTimeout(() => {
                     row.remove();
-                    if (!$("#tbl-customers tbody tr").length){
+                    if (!$("#tbl-customers tbody tr").length) {
                         $("#tbl-customers tfoot").removeClass('d-none');
                     }
                 }, 500)
             }, 200);
-        }else{
+        } else {
             alert("Failed to delete, try again");
         }
     });
@@ -94,4 +94,36 @@ $('#tbl-customers tbody').on('click', ".bi.bi-trash", (e)=>{
     xhr.send();
 });
 
+const modal = $("#new-customer-modal")[0];
+
+modal.addEventListener('shown.bs.modal', () => {
+    $("#new-customer-modal #txt-name").trigger('focus');
+});
+modal.addEventListener('hidden.bs.modal', () => {
+    $("#txt-name, #txt-address").val("");
+});
+
 $("header button").trigger('click');
+
+$('#btn-save').on('click', () => {
+    const txtName = $("#txt-name");
+    const txtAddress = $("#txt-address");
+    const name = txtName.val().trim();
+    const address = txtAddress.val().trim();
+
+    $("#txt-address, #txt-name").removeClass('is-invalid');
+
+    if (address.length < 3) {
+        txtAddress.addClass('is-invalid')
+            .trigger('focus').trigger('select');
+    }
+    if (!/^[A-Za-z ]+$/.test(name)) {
+        txtName.addClass('is-invalid')
+            .trigger('focus').trigger('select');
+    }
+
+});
+
+$("#txt-name, #txt-address").on('input', function () {
+    $(this).removeClass('is-invalid');
+})
