@@ -205,10 +205,31 @@ btnSave.on('click', () => {
     btnSave.prop('disabled', true);
     const btnLoaderWrapper = $("#btn-save .loader-wrapper");
     btnLoaderWrapper.removeClass('d-none');
+    const progressBar = $("#progress-bar");
+    progressBar.removeClass('d-none')
+        .css('background-color', 'lawngreen');
 
     const xhr = new XMLHttpRequest();
 
+    /* Upload (Request) - 50% */
+    xhr.upload.addEventListener('progress', (e)=>{
+        progressBar.css('width', `${e.loaded / e.total * 50}%`);
+    });
+    xhr.upload.addEventListener('loadend', (e)=>{
+        progressBar.css('width', `50%`);
+    });
+
+    /* Download (Response) - 50% */
+    xhr.addEventListener('progress', (e)=>{
+        progressBar.css('width', `${50 + (e.loaded / e.total * 50)}%`);
+    });
     xhr.addEventListener('loadend', ()=>{
+        progressBar.css('width', `100%`)
+            .css('background-color', 'red');
+        setTimeout(() => {
+            progressBar.addClass('d-none')
+                .css('width', '0');
+        }, 500);
         btnLoaderWrapper.addClass('d-none');
         btnSave.prop('disabled', false);
         if (xhr.status === 201){

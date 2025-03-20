@@ -92,6 +92,7 @@ header {
   top: 0;
   transition: width 400ms;
   height: 2px;
+  z-index: 9999999999999;
 }
 
 #profile-picture {
