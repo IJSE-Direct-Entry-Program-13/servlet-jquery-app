@@ -122,6 +122,8 @@ $("#btn-clear").on('click', () => {
 
 $("#txt-name, #txt-address").on('input', function () {
     $(this).removeClass('is-invalid');
+}).on('keypress', (e)=>{
+    if (e.key === 'Enter') btnSave.trigger('click');
 });
 
 profilePictureElm.on('dragover', (e) => {
@@ -134,9 +136,9 @@ profilePictureElm.on('dragover', (e) => {
     e.preventDefault();
     profilePictureElm.removeClass('drop-effect');
     const fileList = e.originalEvent.dataTransfer.files;
-    if (fileList.length){
+    if (fileList.length) {
         const file = fileList[0];
-        if (file.type.startsWith("image/")){
+        if (file.type.startsWith("image/")) {
             loadImageFile(file);
         }
     }
@@ -150,7 +152,7 @@ flPicture.on('change', () => {
     }
 });
 
-function loadImageFile(file){
+function loadImageFile(file) {
     if (file.size >= (5 * 1024 * 1024)) return;
     const fileReader = new FileReader();
     fileReader.addEventListener('load', () => {
@@ -184,11 +186,13 @@ btnSave.on('click', () => {
             .trigger('focus').trigger('select');
         valid = false;
     }
-    if (!flPicture.val()) {
+    if (profilePictureElm.css('background-image') === 'none') {
         profilePictureElm.addClass('is-invalid');
         valid = false;
     }
     if (!valid) return;
 
     btnSave.prop('disabled', true);
+    const btnLoaderWrapper = $("#btn-save .loader-wrapper");
+    btnLoaderWrapper.removeClass('d-none');
 });
