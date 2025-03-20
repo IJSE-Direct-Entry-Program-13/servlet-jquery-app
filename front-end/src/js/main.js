@@ -124,28 +124,6 @@ $("#txt-name, #txt-address").on('input', function () {
     $(this).removeClass('is-invalid');
 });
 
-$('#btn-save').on('click', () => {
-    const txtName = $("#txt-name");
-    const txtAddress = $("#txt-address");
-    const name = txtName.val().trim();
-    const address = txtAddress.val().trim();
-
-    $("#txt-name, #txt-address, #profile-picture")
-        .removeClass('is-invalid');
-
-    if (address.length < 3) {
-        txtAddress.addClass('is-invalid')
-            .trigger('focus').trigger('select');
-    }
-    if (!/^[A-Za-z ]+$/.test(name)) {
-        txtName.addClass('is-invalid')
-            .trigger('focus').trigger('select');
-    }
-    if (!flPicture.val()) {
-        profilePictureElm.addClass('is-invalid');
-    }
-});
-
 profilePictureElm.on('dragover', (e) => {
     e.preventDefault();
 }).on('dragenter', () => {
@@ -173,6 +151,7 @@ flPicture.on('change', () => {
 });
 
 function loadImageFile(file){
+    if (file.size >= (5 * 1024 * 1024)) return;
     const fileReader = new FileReader();
     fileReader.addEventListener('load', () => {
         profilePictureElm
@@ -183,3 +162,33 @@ function loadImageFile(file){
     });
     fileReader.readAsDataURL(file);
 }
+
+const btnSave = $("#btn-save");
+btnSave.on('click', () => {
+    const txtName = $("#txt-name");
+    const txtAddress = $("#txt-address");
+    const name = txtName.val().trim();
+    const address = txtAddress.val().trim();
+    let valid = true;
+
+    $("#txt-name, #txt-address, #profile-picture")
+        .removeClass('is-invalid');
+
+    if (address.length < 3) {
+        txtAddress.addClass('is-invalid')
+            .trigger('focus').trigger('select');
+        valid = false;
+    }
+    if (!/^[A-Za-z ]+$/.test(name)) {
+        txtName.addClass('is-invalid')
+            .trigger('focus').trigger('select');
+        valid = false;
+    }
+    if (!flPicture.val()) {
+        profilePictureElm.addClass('is-invalid');
+        valid = false;
+    }
+    if (!valid) return;
+
+    btnSave.prop('disabled', true);
+});
