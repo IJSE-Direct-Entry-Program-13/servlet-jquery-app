@@ -101,6 +101,7 @@ header {
   background-position: center top;
 
   .bi-image {
+    pointer-events: none;
     font-size: 3rem;
     color: green;
   }
