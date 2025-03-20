@@ -70,6 +70,7 @@ function loadAllCustomers() {
 
 function loadImageFile(file) {
     if (file.size >= (5 * 1024 * 1024)) return;
+    profilePictureFile = file;
     const fileReader = new FileReader();
     fileReader.addEventListener('load', () => {
         profilePictureElm
@@ -140,6 +141,7 @@ $("#btn-clear").on('click', () => {
     flPicture.val('');
     profilePictureElm.css('background-image', '');
     $("#profile-picture .bi-image").removeClass('d-none');
+    profilePictureFile = null;
 });
 
 $("#txt-name, #txt-address").on('input', function () {
@@ -194,7 +196,7 @@ btnSave.on('click', () => {
             .trigger('focus').trigger('select');
         valid = false;
     }
-    if (profilePictureElm.css('background-image') === 'none') {
+    if (!profilePictureFile) {
         profilePictureElm.addClass('is-invalid');
         valid = false;
     }
@@ -207,7 +209,15 @@ btnSave.on('click', () => {
     const xhr = new XMLHttpRequest();
 
     xhr.addEventListener('loadend', ()=>{
-
+        btnLoaderWrapper.addClass('d-none');
+        btnSave.prop('disabled', false);
+        if (xhr.status === 201){
+            $("#btn-close").trigger('click');
+            $("#tbl-customers tbody").empty();
+            loadAllCustomers();
+        }else{
+            alert("Failed to save the customer, try again");
+        }
     });
 
     xhr.open('POST',
@@ -217,6 +227,8 @@ btnSave.on('click', () => {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("address", address);
-    formData.append("profilePicture", /* FILE */);
+    formData.append("profilePicture", profilePictureFile);
+
+    xhr.send(formData);
 
 });
