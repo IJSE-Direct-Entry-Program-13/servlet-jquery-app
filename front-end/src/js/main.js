@@ -96,6 +96,7 @@ $('#tbl-customers tbody').on('click', ".bi.bi-trash", (e) => {
 
 const modal = $("#new-customer-modal")[0];
 const flPicture = $("#fl-picture");
+const profilePictureElm = $("#profile-picture");
 
 $("header button").trigger('click');
 
@@ -115,7 +116,7 @@ $("#btn-browse").on('click', () => {
 
 $("#btn-clear").on('click', () => {
     flPicture.val('');
-    $("#profile-picture").css('background-image','');
+    profilePictureElm.css('background-image', '');
     $("#profile-picture .bi-image").removeClass('d-none');
 });
 
@@ -124,11 +125,11 @@ flPicture.on('change', () => {
     if (fileList.length) {
         const file = fileList[0];
         const fileReader = new FileReader();
-        fileReader.addEventListener('load', ()=>{
-            $("#profile-picture")
+        fileReader.addEventListener('load', () => {
+            profilePictureElm
                 .removeClass('is-invalid')
                 .css('background-image',
-                `url('${fileReader.result}')`);
+                    `url('${fileReader.result}')`);
             $("#profile-picture .bi-image").addClass('d-none');
         });
         fileReader.readAsDataURL(file);
@@ -156,7 +157,17 @@ $('#btn-save').on('click', () => {
         txtName.addClass('is-invalid')
             .trigger('focus').trigger('select');
     }
-    if (!flPicture.val()){
-        $("#profile-picture").addClass('is-invalid');
+    if (!flPicture.val()) {
+        profilePictureElm.addClass('is-invalid');
     }
+});
+
+profilePictureElm.on('dragover', (e) => {
+    e.preventDefault();
+}).on('dragenter', () => {
+    profilePictureElm.addClass('drop-effect');
+}).on('dragleave', () => {
+    profilePictureElm.removeClass('drop-effect');
+}).on('drop', () => {
+    console.log("Dropped");
 });
